@@ -1,0 +1,10 @@
+{
+  "name": "Server",
+  "version": "0.0.0",
+  "description": "Server",
+  "main": "app.js",
+  "author": {
+    "name": "ek2zqun",
+    "email": ""
+  }
+}
