@@ -3,16 +3,17 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <Name>Server</Name>
-    <RootNamespace>Server</RootNamespace>
+    <Name>Common</Name>
+    <RootNamespace>Common</RootNamespace>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>45d4224b-4bc2-42d1-9d6d-98b465df111f</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
-    <StartupFile>server.js</StartupFile>
+    <ProjectGuid>04e1c03a-79c3-443b-805f-94d69ba1a143</ProjectGuid>
+    <ProjectHome>
+    </ProjectHome>
+    <StartupFile>test.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -30,7 +31,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="server.js" />
+    <Compile Include="test.js" />
+    <Compile Include="cache.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>

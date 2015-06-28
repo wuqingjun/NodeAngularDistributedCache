@@ -1,0 +1,10 @@
+{
+  "name": "NodeAngularDistributedCache",
+  "version": "0.0.0",
+  "description": "NodeAngularDistributedCache",
+  "main": "app.js",
+  "author": {
+    "name": "ek2zqun",
+    "email": ""
+  }
+}

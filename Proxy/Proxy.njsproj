@@ -31,7 +31,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="proxy.js" />
-    <Compile Include="cache.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
