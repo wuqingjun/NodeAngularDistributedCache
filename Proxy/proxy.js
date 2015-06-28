@@ -28,24 +28,16 @@ var server = net.createServer(function (c) { //'connection' listener
         console.log('client disconnected');
     });
     c.on('data', function (data) {
-        buf = new Buffer(256);
-        len = buf.write(data.toString());
-        k = buf.toString('ascii', 0, len);
-        console.log(globalCache.Objectes);
-        console.log('k is ' + k);
-        if (k === 'k1') {
-            console.log('equal');
-        }
-        console.log('what I got ' + globalCache.get(k));
-        v = globalCache.get(k);
-        if (v !== undefined) {
-            c.write(v);
-            c.pipe(c);
-        } 
+        var buf = new Buffer(256);
+        var len = buf.write(data.toString(), 0, 'ascii');
+        var k = buf.toString('ascii', 0, len);
+        var v = globalCache.get(k);
+        c.write(v !== undefined ? v : 'undefined');
+        c.pipe(c);
     });
 });
 
-server.listen(8124, function () { //'listening' listener
+server.listen(8124, function () {
     console.log('server bound');
 });
 
