@@ -5,4 +5,4 @@ var cache = require('./cache.js');
 console.log(cache.testonly);
 console.log(cache.Cache);
 cache.Cache.push('k', 'v');
-console.log(cache.Cache.objects);
+console.log(cache.Cache.get('k'));

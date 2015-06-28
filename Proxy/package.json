@@ -2,7 +2,7 @@
   "name": "Proxy",
   "version": "0.0.0",
   "description": "Proxy",
-  "main": "app.js",
+  "main": "proxy.js",
   "author": {
     "name": "ek2zqun",
     "email": ""
