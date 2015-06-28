@@ -8,8 +8,8 @@ This API table is modeled after the framework detailed here: https://en.wikipedi
 | URI | GET | PUT | POST | DELETE |
 |-----|-----|-----|------|--------|
 | /, /index | Serve the Client Application | Not Supported | Not Supported | Not Supported |
-| /app/<resource> | Support space for Client Application | Not Supported | Not Supported | Not Supported |
+| /app/:resource | Support space for Client Application | Not Supported | Not Supported | Not Supported |
 | /data | List details about the Load Balancer Server's data service and all URIs available. | Not Supported | Not Supported | Not Supported |
-| /data/<key> | Retrieve <value> for <key> from the system. | Store or replace <key> and its <value> in the system. | Not Supported | Delete <key> and its <value> from the system. |
-| /server | Lists all available Cache server and their status | Not Supported | Register a new Cache Server. | Delete all Cache Servers. |
-| /server/<id> | List details about Cache Server <id>. | Replace an existing Cache Server <id>. | Not Supported | Delete Cache Server <id>. |
+| /data/:key | Retrieve :value for :key from the system. | Store or replace :key and its :value in the system. | Not Supported | Delete :key and its :value from the system. |
+| /servers | Lists all available Cache server and their status | Not Supported | Register a new Cache Server. | Delete all Cache Servers. |
+| /servers/:id | List details about Cache Server :id. | Replace an existing Cache Server :id. | Not Supported | Delete Cache Server :id. |
