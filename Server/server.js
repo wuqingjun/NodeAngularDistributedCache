@@ -2,6 +2,7 @@
 var Cache = require('../Common/cache.js');
 var restify = require('restify');
 var querystring = require('querystring');
+var minimist = require('minimist');
 
 var globalCache = new Cache();
 
@@ -77,19 +78,10 @@ server.del('/data', function (req, res, next) { // delete all
 //  -----------------------  //
 //  Register with the Proxy  //
 //  -----------------------  //
-var defaultProxy = { host: 'localhost', port: 8080 }
 var myId = null;
 var loadBalancer = null;
 
-function register(args) {
-
-    var loadBalancerUrl = "http://"
-    if (args.length == 2) {
-        loadBalancerUrl += args[0] + ":" + args[1];
-    }
-    else {
-        loadBalancerUrl += defaultProxy.host + ":" + defaultProxy.port;
-    }
+function register(loadBalancerUrl) {
 
     loadBalancer = restify.createJsonClient({
         url: loadBalancerUrl
@@ -126,14 +118,25 @@ function unregister() {
 //  --------------  //
 //  Run the server  //
 //  --------------  //
-server.listen(PORT, function () {
-    console.log("Cache Server Listening on: http://localhost:%s", PORT);
-    register(process.argv.slice(2));
+
+/* run it like this
+    node server.js [port] [loadbalancer-address]
+*/
+var argOpts = {
+    default: {
+        port: PORT,
+        lbHost: 'localhost',
+        lbPort: 8080
+    }
+}
+var argv = minimist(process.argv.slice(2), argOpts);
+
+server.listen(argv.port, function () {
+    console.log("Cache Server Listening on: http://localhost:%s", argv.port);
+    register("http://" + argv.lbHost + ":" + argv.lbPort);
 });
 
 process.on('SIGINT', function () {
-    console.log('SIGINT');
-    console.log(myId);
     if (loadBalancer != null && myId != null) {
         unregister();
     }
