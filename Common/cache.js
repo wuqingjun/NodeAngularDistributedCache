@@ -22,4 +22,6 @@ Cache.prototype.clear = function () {
     this.Executing = false;
 };
 
+Cache.default = null;
+
 module.exports = Cache;

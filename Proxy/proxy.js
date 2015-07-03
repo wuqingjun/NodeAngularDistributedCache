@@ -1,13 +1,17 @@
-﻿//var http = require("http");
-var Cache = require('../Common/cache.js');
+﻿
+var Cache = require('../Common/cache.js'); // i think this can go away now
+var Utilities = require('../Common/utilities.js');
+
 var net = require("net");
 var restify = require('restify');
 var crypto = require('crypto');
+var httpProxy = require('http-proxy');
+var proxyService = httpProxy.createServer();
 
-var globalCache = new Cache();
+var globalCache = new Cache();  // this too
 
-PORT = 8080;
-
+var PORT = 8080;
+var DEBUG = 1;
 
 //  ------------  //
 //  Server Setup  //
@@ -19,38 +23,36 @@ var server = restify.createServer({
 // uncomment for nifty curl support
 // server.pre(restify.pre.userAgentConnection());
 
-server.use(restify.bodyParser());
+// credit: https://gist.github.com/jeffwhelpley/5417758
+var wrapper = function (middleware) {
+    return function (req, res, next) {
+        var regex = /^\/data.*$/;
 
+        // if url is a proxy request, don't do anything and move to next middleware
+        if (regex.test(req.url)) {
+            next();
+        }
+            // else invoke middleware
+        else {
+            // some middleware is an array (ex. bodyParser)
+            if (middleware instanceof Array) {
+                middleware[0](req, res, function () {
+                    middleware[1](req, res, next);
+                });
+            }
+            else {
+                middleware(req, res, next);
+            }
+        }
+    };
+};
 
-//  ---------------------  //
-//  Cache Server Handling  //
-//  ---------------------  //
-var cacheServers = [// TO DO: start out with empty list and update everything to react appropriately
-                    {
-                        id: 0,
-                        connectionInfo: { port: 8124 }
-                    }];
+server.use(wrapper(restify.bodyParser()));
 
-var nextServerId = cacheServers.length;
-function nextId() {
-    return nextServerId++;
-}
-
-function selectServer(req) {
-
-    // This function selects a 'random' cache server based on an md5 hash of the incoming request.
-
-    if (cacheServers.length == 0) {
-        return undefined;
-    }
-
-    var unhashedString = "" + req;
-    var hashed = crypto.createHash('md5').update(unhashedString).digest('hex').substring(0,4);
-    var integer = parseInt(hashed, 16);
-    var idx = integer % cacheServers.length;
-    return cacheServers[idx].connectionInfo;
-}
-
+// credit: http://stackoverflow.com/questions/22462895/post-request-dont-work-in-restify-getting-a-500-internal-server-error
+server.on('uncaughtException', function (req, res, route, err) {
+    console.log('uncaughtException', err.stack);
+});
 
 
 //  ------------------  //
@@ -74,64 +76,62 @@ server.get('/', restify.serveStatic({
 }));
 server.get('/index', sendIndexHtml);
 
-server.get('/data/:key', function (req, res, next) { // retrieve :key value
-    var serverOptions = selectServer(req); // select a random server
 
-    if (serverOptions === undefined) {
+//  ---------------------  //
+//  Cache Server Handling  //
+//  ---------------------  //
+var cacheServers = [// TO DO: start out with empty list and update everything to react appropriately
+                    /*{
+                        id: 0,
+                        connectionInfo: { port: 8124 }
+                    }*/
+                    ];
+
+var nextServerId = cacheServers.length;
+function nextId() {
+    return nextServerId++;
+}
+
+function selectServer(req) {
+
+    // This function selects a 'random' cache server based on an md5 hash of the incoming request.
+
+    if (cacheServers.length == 0) {
+        return undefined;
+    }
+
+    var unhashedString = "" + req;
+    var hashed = crypto.createHash('md5').update(unhashedString).digest('hex').substring(0, 4);
+    var integer = parseInt(hashed, 16);
+    var idx = integer % cacheServers.length;
+    return cacheServers[idx].connectionInfo;
+}
+
+
+//  --------------  //
+//  Load Balancing  //
+//  --------------  //
+function redirectRequest(req, res, next) {
+    var connectionInfo = selectServer(req); // select a random server
+
+    if (connectionInfo === undefined) {
         console.log("No cache servers available");
         res.send("");
         return next();
     }
 
-    var client = net.connect(serverOptions,
-    function () {
-        client.write(req.params.key, 'ascii');
-    });
-
-    client.on('data', function (data) {
-        var val = data.toString();
-        res.json(val);
-        client.end();
-    });
-
-    client.on('end', function () {
-        console.log('disconnected from server');
-    });
-
-    return next();
-});
-
-
-server.put('/data/:key', function (req, res, next) { // store or replace :key
-
-    var serverOptions = selectServer(req); // select a random server
-
-    if (serverOptions === undefined) {
-        console.log("No cache servers available");
-        res.send("");
-        return next();
+    if (DEBUG >= 1) {
+        console.log(connectionInfo);
+        console.log("Proxying '"+req.url+"' to '"+connectionInfo+"'");
     }
 
-    console.log("TO DO: save/overwrite value '" + req.params.value + "' for key '" + req.params.key + "'");
-    res.send("");
+    proxyService.web(req, res, { target: connectionInfo });
     return next();
-});
+}
 
-server.del('/data/:key', function (req, res, next) { // delete :key
-
-    var serverOptions = selectServer(req); // select a random server
-
-    if (serverOptions === undefined) {
-        console.log("No cache servers available");
-        res.send("");
-        return next();
-    }
-
-    console.log("TO DO: delete key '" + req.params.key + "'");
-    res.send(true);
-    return next();
-});
-
+server.get('/data/:key', redirectRequest);
+server.put('/data/:key', redirectRequest);
+server.del('/data/:key', redirectRequest);
 
 
 //  --------  //
@@ -145,9 +145,39 @@ server.get('/servers', function (req, res, next) { // list all servers
 
 server.post('/servers', function (req, res, next) { // add a new server
     // TO DO: test this, validate incoming parameter data
-    var newServer = { id: nextId(), connectionInfo: req.params };
-    cacheServers.push(newServer);
-    req.send(true);
+
+    if (req.params.hasOwnProperty('port')) {
+        req.params.port = parseInt(req.params.port, 10);
+    }
+    if (DEBUG >= 1) {
+        console.log("/servers POST: ");
+        console.log(req.params);
+    }
+
+    var newId = null;
+    for (var idx = 0; idx < cacheServers.length; idx++) {
+        if (Utilities.checkEqual(cacheServers[idx].connectionInfo, req.params)) {
+            if (DEBUG >= 1) {
+                console.log("Attempt to register existing server: " + JSON.stringify(req.params));
+                console.log(cacheServers[idx]);
+                console.log(cacheServers[idx].id);
+            }
+            newId = cacheServers[idx].id;
+            break;
+        }
+    }
+
+    if (newId === null) {
+        newId = nextId();
+        var newServer = { id: newId, connectionInfo: req.params };
+        cacheServers.push(newServer);
+    }
+
+    if (DEBUG >= 1) {
+        console.log("New ID: " + newId);
+    }
+
+    res.send(""+newId);
     return next();
 });
 
@@ -211,12 +241,12 @@ server.del('/servers/:id', function (req, res, next) { // delete server :id
 //  --------------  //
 //  Run the server  //
 //  --------------  //
-server.listen(8080, function () {
+server.listen(PORT, function () {
     console.log("Load Balancing Proxy Server RESfully Listening on: http://localhost:%s", PORT);
 });
 
 
-setInterval(function() { // what does this do?
+setInterval(function() {
     if (!globalCache.Executing) {
     }
 }, 3000);
