@@ -7,7 +7,7 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Proxy", "Proxy\Proxy.njspro
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Server", "Server\Server.njsproj", "{45D4224B-4BC2-42D1-9D6D-98B465DF111F}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "NodejsWebApp1", "NodejsWebApp1\NodejsWebApp1.njsproj", "{F6F9D990-DBB7-44AB-B5E2-0220F077099C}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "WebApp", "NodejsWebApp1\WebApp.njsproj", "{F6F9D990-DBB7-44AB-B5E2-0220F077099C}"
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Common", "Common\Common.njsproj", "{04E1C03A-79C3-443B-805F-94D69BA1A143}"
 EndProject

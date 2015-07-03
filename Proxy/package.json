@@ -6,5 +6,8 @@
   "author": {
     "name": "ek2zqun",
     "email": ""
+  },
+  "dependencies": {
+    "restify": "^3.0.3"
   }
 }

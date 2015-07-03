@@ -57,23 +57,24 @@ function selectServer(req) {
 //  Client Application  //
 //  ------------------  //
 function sendApp(req, res, next) {
+    console.log("sending App");
     res.send("TO DO: send down the AngularJS Client Application");
     return next();
 }
 
-server.get('/', sendApp);
-server.get('/index', sendApp);
+function sendIndexHtml(req, res, next) {
+    console.log("Sending Index.html");
+    res.sendFile('./public/index.html');
+    return next();
+}
 
-// Placeholder for application support URI
-//server.get('/app/:resource', function (req, res, next) { });
+server.get('/', restify.serveStatic({
+    'directory': './public',
+    'default': 'index.html'
+}));
+server.get('/index', sendIndexHtml);
 
-
-
-//  -----  //
-//  /data  //
-//  -----  //
 server.get('/data/:key', function (req, res, next) { // retrieve :key value
-
     var serverOptions = selectServer(req); // select a random server
 
     if (serverOptions === undefined) {
@@ -84,17 +85,12 @@ server.get('/data/:key', function (req, res, next) { // retrieve :key value
 
     var client = net.connect(serverOptions,
     function () {
-        console.log('connected to server ascii!');
-        console.log('requesting ' + req.params.key);
-
-        // TO DO: Update client server code to be RESTful
         client.write(req.params.key, 'ascii');
     });
 
     client.on('data', function (data) {
         var val = data.toString();
-        console.log('retrieved ' + req.params.key + ':' + val);
-        res.send(val);
+        res.json(val);
         client.end();
     });
 

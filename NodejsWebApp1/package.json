@@ -1,10 +1,16 @@
 {
-  "name": "NodejsWebApp1",
+  "name": "WebApp",
   "version": "0.0.0",
-  "description": "NodejsWebApp1",
+  "description": "Web Application using AngularJs and NodeJs",
   "main": "server.js",
   "author": {
     "name": "ek2zqun",
     "email": ""
+  },
+  "dependencies": {
+    "body-parser": "^1.13.1",
+    "express": "^4.13.0",
+    "method-override": "^2.3.3",
+    "morgan": "^1.6.0"
   }
 }
