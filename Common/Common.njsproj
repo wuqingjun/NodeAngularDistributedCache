@@ -33,6 +33,7 @@
   <ItemGroup>
     <Compile Include="commontest.js" />
     <Compile Include="cache.js" />
+    <Compile Include="utilities.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
