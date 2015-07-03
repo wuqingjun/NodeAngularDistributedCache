@@ -15,10 +15,16 @@
 </div>
 <script>
     var app = angular.module("myApp", []);
-    app.controller("myCtrl", function ($scope) {
-        $scope.records = [{ key: "k1", value: 'v1' }, { key: "k2", value: 'v2' }];
+    app.controller("myCtrl", function ($scope, $http) {
+        //$scope.records = [{ key: "k1", value: 'v1' }, { key: "k2", value: 'v2' }];
+        $scope.records = {};
+        $http.get('/all').success(function(data) {
+            $scope.records = data;
+        })
+            .error(function(data) {
+            console.log('Error:' + data);
+        });
     });
-
 </script>
 </body>
 </html>
