@@ -150,8 +150,7 @@ server.post('/servers', function (req, res, next) { // add a new server
         req.params.port = parseInt(req.params.port, 10);
     }
     if (DEBUG >= 1) {
-        console.log("/servers POST: ");
-        console.log(req.params);
+        console.log("/servers POST: %j", req.params);
     }
 
     var newId = null;
@@ -177,7 +176,8 @@ server.post('/servers', function (req, res, next) { // add a new server
         console.log("New ID: " + newId);
     }
 
-    res.send(""+newId);
+    res.setHeader('content-type', 'application/json');
+    res.send({ id: newId });
     return next();
 });
 
@@ -219,13 +219,22 @@ server.put('/servers/:id', function (req, res, next) { // replace server :id
 server.del('/servers/:id', function (req, res, next) { // delete server :id
     // TO DO: test this
 
+    if (DEBUG >= 1) {
+        console.log("/servers DEL: " + req.params.id);
+    }
+
     // loop through all servers until we find the id to delete
     //  if it's the last one, pop it off the list
     //  else, put the last one in its place (order doesn't matter)
     for (var idx = 0; idx < cacheServers.length; idx++) {
+        console.log(" cacheServers[idx].id: " + cacheServers[idx].id);
+        console.log("        req.params.id: " + req.params.id);
         if (cacheServers[idx].id == req.params.id) {
+            console.log("Found " + req.params.id);
             var last = cacheServers.pop();
-            if (idx != cacheServers.length - 1) {
+            console.log(last);
+            console.log(cacheServers);
+            if (idx != cacheServers.length) {
                 cacheServers[idx] = last;
             }
             res.send(true);

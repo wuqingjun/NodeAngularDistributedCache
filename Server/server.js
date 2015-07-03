@@ -78,98 +78,48 @@ server.del('/data', function (req, res, next) { // delete all
 //  Register with the Proxy  //
 //  -----------------------  //
 var defaultProxy = { host: 'localhost', port: 8080 }
-var activeConnection = null;
 var myId = null;
+var loadBalancer = null;
 
 function register(args) {
 
-    // credit: https://nodejs.org/api/http.html#http_http_request_options_callback
-    var postData = querystring.stringify({
-        'port' : PORT,
-    });
-    
-    var connectionOptions = {
-        host: defaultProxy.host,
-        port: defaultProxy.port,
-        path: "/servers",
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': postData.length
-        }
-    };
-    
+    var loadBalancerUrl = "http://"
     if (args.length == 2) {
-        connectionOptions.host = args[0];
-        connectionOptions.port = args[1];
+        loadBalancerUrl += args[0] + ":" + args[1];
+    }
+    else {
+        loadBalancerUrl += defaultProxy.host + ":" + defaultProxy.port;
     }
 
-    var req = http.request(connectionOptions, function (res) {
+    loadBalancer = restify.createJsonClient({
+        url: loadBalancerUrl
+    });
+    
+    loadBalancer.post('/servers', { 'port': PORT }, function (err, req, res, obj) {
+        if (err) {
+            console.log('Problem with request: ' + err);
+        }
+        myId = obj.id;
         if (DEBUG >= 1) {
-            console.log('STATUS: ' + res.statusCode);
-            console.log('HEADERS: ' + JSON.stringify(res.headers));
+            console.log('%d -> %j', res.statusCode, res.headers);
+            console.log('%j', obj);
         }
-
-        if (res.statusCode != 200) {
-            console.log("Failed to Register with Load Balancer");
-            process.exit();
-        }
-
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            if (DEBUG >= 1) {
-                console.log('BODY: ' + chunk);
-            }
-            myId = parseInt(chunk.replace('"', ''), 10);
-        });
-
-        activeConnection = {
-            host: connectionOptions.host,
-            port: connectionOptions.port
-        };
     });
-
-    req.on('error', function (e) {
-        console.log('Problem with request: ' + e.message);
-    });
-
-    // write data to request body
-    req.write(postData);
-    req.end();
 }
-    /*
-    THIS DOESNT WORK YET.
+
 function unregister() { 
-
-    var connectionOptions = {
-        host: activeConnection.host,
-        port: activeConnection.port,
-        path: "/servers/"+myId,
-        method: "DELETE"
-    };
-
-    var req = http.request(connectionOptions, function (res) {
+    loadBalancer.del('/servers/' + myId, function (err, req, res) {
+        if (err){
+            console.log('Problem with request: ' + err);
+        }
         if (DEBUG >= 1) {
-            console.log('STATUS: ' + res.statusCode);
-            console.log('HEADERS: ' + JSON.stringify(res.headers));
+            console.log('%d -> %j', res.statusCode, res.headers);
         }
-
-        if (res.statusCode != 200) {
-            console.log("Failed to Unregister with Load Balancer");
-            process.exit();
-        }
-
-        activeConnection = null;
         myId = null;
+        loadBalancer = null;
+        process.exit();
     });
-
-    req.on('error', function (e) {
-        console.log('Problem with request: ' + e.message);
-    });
-
-    req.write("");
-    req.end();
-}*/
+}
 
 //  --------------  //
 //  Run the server  //
@@ -179,15 +129,10 @@ server.listen(PORT, function () {
     register(process.argv.slice(2));
 });
 
-/*
-THIS DOESNT WORK YET
 process.on('SIGINT', function () {
     console.log('SIGINT');
-    console.log(activeConnection);
     console.log(myId);
-    if (activeConnection != null && myId != null) {
+    if (loadBalancer != null && myId != null) {
         unregister();
     }
-    process.exit();
 });
-*/
