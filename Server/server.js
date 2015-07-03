@@ -97,13 +97,15 @@ function register(args) {
     
     loadBalancer.post('/servers', { 'port': PORT }, function (err, req, res, obj) {
         if (err) {
-            console.log('Problem with request: ' + err);
+            console.log('Problem Registering with Load Balancer: %s', err);
+            process.exit();
         }
         myId = obj.id;
         if (DEBUG >= 1) {
             console.log('%d -> %j', res.statusCode, res.headers);
             console.log('%j', obj);
         }
+
     });
 }
 
@@ -134,5 +136,8 @@ process.on('SIGINT', function () {
     console.log(myId);
     if (loadBalancer != null && myId != null) {
         unregister();
+    }
+    else {
+        process.exit();
     }
 });
