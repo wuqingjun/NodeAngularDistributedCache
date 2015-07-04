@@ -26,6 +26,16 @@ var server = restify.createServer({
 server.use(restify.bodyParser());
 
 
+server.get('/', restify.serveStatic({
+    'directory': './public',
+    'default': 'index.html'
+}));
+
+server.get('/all', function(req, res, next) {
+    res.json([{ key: 'k21', value: 'v21' }, { key: 'k22', value: 'v22' }]);
+    return next();
+});
+
 server.get('/data/:key', function (req, res, next) { // retrieve :key value
     
     var value = globalCache.get(req.params.key);

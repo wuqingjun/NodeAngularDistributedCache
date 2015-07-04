@@ -54,37 +54,16 @@ server.on('uncaughtException', function (req, res, route, err) {
     console.log('uncaughtException', err.stack);
 });
 
-
-//  ------------------  //
-//  Client Application  //
-//  ------------------  //
-function sendApp(req, res, next) {
-    console.log("sending App");
-    res.send("TO DO: send down the AngularJS Client Application");
-    return next();
-}
-
-function sendIndexHtml(req, res, next) {
-    console.log("Sending Index.html");
-    res.sendFile('./public/index.html');
-    return next();
-}
-
-server.get('/', restify.serveStatic({
-    'directory': './public',
-    'default': 'index.html'
-}));
-server.get('/index', sendIndexHtml);
-
+server.get('/', redirectRequest);
 
 //  ---------------------  //
 //  Cache Server Handling  //
 //  ---------------------  //
 var cacheServers = [// TO DO: start out with empty list and update everything to react appropriately
-                    /*{
+                    {
                         id: 0,
-                        connectionInfo: { port: 8124 }
-                    }*/
+                        connectionInfo: 'http://localhost:8124'
+                    }
                     ];
 
 var nextServerId = cacheServers.length;
@@ -93,9 +72,6 @@ function nextId() {
 }
 
 function selectServer(req) {
-
-    // This function selects a 'random' cache server based on an md5 hash of the incoming request.
-
     if (cacheServers.length == 0) {
         return undefined;
     }
@@ -129,6 +105,7 @@ function redirectRequest(req, res, next) {
     return next();
 }
 
+server.get('/all', redirectRequest);
 server.get('/data/:key', redirectRequest);
 server.put('/data/:key', redirectRequest);
 server.del('/data/:key', redirectRequest);
