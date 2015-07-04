@@ -31,8 +31,12 @@ server.get('/', restify.serveStatic({
     'default': 'index.html'
 }));
 
-server.get('/all', function(req, res, next) {
-    res.json([{ key: 'k21', value: 'v21' }, { key: 'k22', value: 'v22' }]);
+server.get('/all', function (req, res, next) {
+    var data = [];
+    for (var k in globalCache.Objectes) {
+        data.push({ key: k, value: globalCache.Objectes[k] });
+    }
+    res.json(data);
     return next();
 });
 
