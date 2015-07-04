@@ -1,4 +1,8 @@
 ﻿var net = require("net");
+var minimist = require('minimist');
+
+//minimist(process.argv)
+
 var client = net.connect({ port: 8124 },
     function () {
     console.log('connected to server ascii!');

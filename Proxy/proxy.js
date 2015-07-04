@@ -60,10 +60,10 @@ server.get('/', redirectRequest);
 //  Cache Server Handling  //
 //  ---------------------  //
 var cacheServers = [// TO DO: start out with empty list and update everything to react appropriately
-                    {
-                        id: 0,
-                        connectionInfo: 'http://localhost:8124'
-                    }
+                    //{
+                    //    id: 0,
+                    //    connectionInfo: 'http://localhost:8124'
+                    //}
                     ];
 
 var nextServerId = cacheServers.length;
