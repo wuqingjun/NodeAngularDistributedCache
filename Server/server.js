@@ -79,6 +79,17 @@ server.put('/data/:key', function (req, res, next) {
     return next();
 });
 
+
+server.post('/data/:key', function (req, res, next) {
+    globalCache.push(req.params.key, req.params.value);
+    if (DEBUG >= 1) {
+        console.log("PUT: {" + req.params.key + ":" + req.params.value + "}");
+    }
+    res.send(true);
+    return next();
+});
+
+
 server.del('/data/:key', function (req, res, next) {
     globalCache.push(req.params.key, globalCache.default);
     if (DEBUG >= 1) {

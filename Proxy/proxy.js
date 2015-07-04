@@ -108,6 +108,7 @@ function redirectRequest(req, res, next) {
 server.get('/all', redirectRequest);
 server.get('/data/:key', redirectRequest);
 server.put('/data/:key', redirectRequest);
+server.post('/data/:key', redirectRequest);
 server.del('/data/:key', redirectRequest);
 
 

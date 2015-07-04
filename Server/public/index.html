@@ -12,6 +12,11 @@
         {{record.key}}
         {{record.value}}
     </div>
+    <div>
+        <input type="text" ng-model="key"/>
+        <input type="text" ng-model="value"/>
+        <input type="button" ng-click="save()"/>
+    </div>
 </div>
 <script>
     var app = angular.module("myApp", []);
@@ -21,8 +26,16 @@
             $scope.records = data;
         })
             .error(function (data) {
-            console.log('Error at server:' + data);
-        });
+            console.log('get error at server:' + data);
+            });
+        $scope.save = function() {
+            $http.post('/data/', { key: $scope.key, value: $scope.value }).success(function(data) {
+                console.log('post success: ' + data);
+            })
+            .error(function(data) {
+                console.log('post error: ' + data);
+            });
+        }
     });
 </script>
 </body>
