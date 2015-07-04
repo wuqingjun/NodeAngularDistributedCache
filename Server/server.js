@@ -1,9 +1,16 @@
-﻿var http = require('http');
+﻿/* run it like this
+    node server.js --port=[port] --ipcPort=[ipcPort] --lbHost=[loadbalancer-address]
+    node server.js --port=8224 --ipcPort=8225 --lbHost=localhost
+*/
+
+var http = require('http');
 var Cache = require('../Common/cache.js');
 var restify = require('restify');
 var querystring = require('querystring');
 var minimist = require('minimist');
 var net = require('net');
+var Registration = require('./register.js');
+
 var globalCache = new Cache();
 
 globalCache.push("k1", 'v1');
@@ -22,7 +29,6 @@ var server = restify.createServer({
 // server.pre(restify.pre.userAgentConnection());
 
 server.use(restify.bodyParser());
-
 
 server.get('/', restify.serveStatic({
     'directory': './public',
@@ -108,53 +114,6 @@ server.del('/data', function (req, res, next) {
     return next();
 });
 
-//  -----------------------  //
-//  Register with the Proxy  //
-//  -----------------------  //
-var myId = null;
-var loadBalancer = null;
-
-function register(loadBalancerUrl) {
-    loadBalancer = restify.createJsonClient({
-        url: loadBalancerUrl
-    });
-    
-    loadBalancer.post('/servers', { 'port': PORT }, function (err, req, res, obj) {
-        if (err) {
-            console.log('Problem Registering with Load Balancer: %s', err);
-            process.exit();
-        }
-        myId = obj.id;
-        if (DEBUG >= 1) {
-            console.log('%d -> %j', res.statusCode, res.headers);
-            console.log('%j', obj);
-        }
-
-    });
-}
-
-function unregister() { 
-    loadBalancer.del('/servers/' + myId, function (err, req, res) {
-        if (err){
-            console.log('Problem with request: ' + err);
-        }
-        if (DEBUG >= 1) {
-            console.log('%d -> %j', res.statusCode, res.headers);
-        }
-        myId = null;
-        loadBalancer = null;
-        process.exit();
-    });
-}
-
-//  --------------  //
-//  Run the server  //
-//  --------------  //
-
-/* run it like this
-    node server.js --port=[port] --ipcPort=[ipcPort] --lbHost=[loadbalancer-address]
-    node server.js --port=8224 --ipcPort=8225 --lbHost=localhost
-*/
 var argOpts = {
     default: {
         port: PORT,
@@ -164,14 +123,12 @@ var argOpts = {
     }
 }
 var argv = minimist(process.argv.slice(2), argOpts);
-console.log(argv);
+var reg = new Registration("http://" + argv.lbHost + ":" + argv.lbPort);
 server.listen(argv.port, function () {
-    console.log("Cache Server Listening on: http://localhost:%s", argv.port);
-    register("http://" + argv.lbHost + ":" + argv.lbPort);
+    reg.register(argv.port, argv.ipcPort);
 });
 
 var ipcserver = net.createServer(function (c) {
-    console.log('client connected');
     c.on('end', function () {
         console.log('client disconnected');
     });
@@ -196,11 +153,9 @@ ipcserver.listen(argv.ipcPort, function () {
     console.log('server bound on port: %s', argv.ipcPort);
 });
 
-
-
 process.on('SIGINT', function () {
-    if (loadBalancer != null && myId != null) {
-        unregister();
+    if (reg.loadBalancer != null && reg.myId != null) {
+        reg.unregister();
     }
     else {
         process.exit();
