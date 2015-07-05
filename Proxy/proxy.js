@@ -1,6 +1,6 @@
-﻿
-var Cache = require('../Common/cache.js'); // i think this can go away now
+﻿var Cache = require('../Common/cache.js'); // i think this can go away now
 var Utilities = require('../Common/utilities.js');
+var IpcServer = require('../Common/ipcserver.js');
 
 var net = require("net");
 var restify = require('restify');
@@ -11,6 +11,7 @@ var proxyService = httpProxy.createServer();
 var globalCache = new Cache();  // this too
 
 var PORT = 8080;
+var IPCPORT = 8081;
 var DEBUG = 1;
 
 //  ------------  //
@@ -167,7 +168,7 @@ server.get('/servers/:id', function (req, res, next) { // get info for server :i
     for (var idx = 0; idx < cacheServers.length; idx++) {
         if (cacheServers[idx].id == req.params.id) {
             res.send(cacheServers[idx]);
-            return next()
+            return next();
         }
     }
     res.send("Server not found");
@@ -223,6 +224,7 @@ server.listen(PORT, function () {
     console.log("Load Balancing Proxy Server RESfully Listening on: http://localhost:%s", PORT);
 });
 
+IpcServer(globalCache, IPCPORT);
 
 setInterval(function() {
     if (!globalCache.Executing) {

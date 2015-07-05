@@ -16,8 +16,8 @@ Cache.prototype.get = function (k) {
 
 Cache.prototype.clear = function () {
     this.Executing = true;
-    while (cache.Cache.objects.length > this.Size) {
-        delete cache.Cache.objects[0];
+    while (this.Objects.length > this.Size) {
+        delete this.Objects[0];
     }
     this.Executing = false;
 };

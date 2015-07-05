@@ -33,6 +33,10 @@
   <ItemGroup>
     <Compile Include="commontest.js" />
     <Compile Include="cache.js" />
+    <Compile Include="createRestifyServer.js" />
+    <Compile Include="ipcclient.js" />
+    <Compile Include="ipcserver.js" />
+    <Compile Include="register.js" />
     <Compile Include="utilities.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />

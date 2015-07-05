@@ -7,6 +7,7 @@
     <RootNamespace>Server</RootNamespace>
     <NodeExeArguments>
     </NodeExeArguments>
+    <Environment>SET DEBUG = 1</Environment>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
