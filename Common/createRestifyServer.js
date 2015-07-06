@@ -17,9 +17,9 @@ function CreateRestifyServer(globalCache, port, ipcport) {
 
     server.use(restify.bodyParser());
 
-    server.get('/', restify.serveStatic({
-        'directory': './public',
-        'default': 'index.html'
+    server.get(/^\/(?!(data|all)).*/, restify.serveStatic({
+        directory: './public',
+        default: 'index.html'
     }));
 
     server.get('/all', function(req, res, next) {
