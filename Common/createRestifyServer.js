@@ -21,7 +21,7 @@ function CreateRestifyServer(globalCache, port, ipcport) {
         directory: './public',
         default: 'index.html'
     }));
-
+    
     server.get('/all', function(req, res, next) {
         console.log('/all');
         console.log(temp.ipcPorts);

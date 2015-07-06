@@ -2,41 +2,156 @@
 <html ng-app="myApp">
 <head>
     <title></title>
-    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
-    <script src="index.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+body {
+    padding-top: 50px;
+}
+.title-banner {
+    padding: 40px 15px;
+    text-align: center;
+}
+    </style>
 </head>
 
 <body>
-<div ng-controller="myCtrl">
-    <div id="listOfRecords" ng-repeat="record in records">
-        {{record.key}}
-        {{record.value}}
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Project name</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <div class="jumbotron">
+        <div class="container">
+            <h2>Welcome to the NodeAngularDistributedCache Front End</h2>
+            <p>This utility can be used to interact with our Distributed Cache System.</p>
+        </div>
     </div>
-    <div>
-        <input type="text" ng-model="key"/>
-        <input type="text" ng-model="value"/>
-        <input type="button" ng-click="save()"/>
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-6 card">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Save a Key / Value Pair</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="key_01" class="col-sm-6 control-label">Key:</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" ng-model="key" id="key_01" placeholder="k1" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="value_01" class="col-sm-6 control-label">Value:</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" ng-model="value" id="value_01" placeholder="v1" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-4">
+                                <button class="btn btn-large btn-primary" ng-click="save()">Save</button>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 card">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Retrieve Value For a Key</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="key_02" class="col-sm-6 control-label">Key:</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" ng-model="key" id="key_02" placeholder="k1" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="value_02" class="col-sm-6 control-label">Value:</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" ng-model="value" id="value_02" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-4">
+                                <button class="btn btn-large btn-primary" ng-click="retrieve()">Retrieve</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.container -->
+
+    <div ng-controller="myCtrl">
+        <div id="listOfRecords" ng-repeat="record in records">
+            {{record.key}}
+            {{record.value}}
+        </div>
     </div>
-</div>
-<script>
-    var app = angular.module("myApp", []);
-    app.controller("myCtrl", function ($scope, $http) {
-        $http.get('/all').success(function (data) {
+
+    <!-- Placed at the end of the document so pages load faster -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <script>
+        var app = angular.module("myApp", []);
+        app.controller("myCtrl", function ($scope, $http) {
+            $http.get('/all').success(function (data) {
                 console.log(data);
-            $scope.records = data;
-        })
-            .error(function (data) {
-            console.log('get error at server:' + data);
-            });
-        $scope.save = function() {
-            $http.post('/data/', { key: $scope.key, value: $scope.value }).success(function(data) {
-                console.log('post success: ' + data);
+                $scope.records = data;
             })
-            .error(function(data) {
-                console.log('post error: ' + data);
+            .error(function (data) {
+                console.log('get error at server:' + data);
             });
-        }
-    });
-</script>
+            $scope.save = function () {
+                $http.post('/data/', { key: $scope.key, value: $scope.value }).success(function (data) {
+                    console.log('post success: ' + data);
+                })
+                .error(function (data) {
+                    console.log('post error: ' + data);
+                });
+            }
+            $scope.retrieve = function () {
+                $http.get('/data/' + $scope.key).success(function (data) {
+                    console.log('post success: ' + data);
+                })
+                .error(function (data) {
+                    console.log('post error: ' + data);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
