@@ -33,7 +33,8 @@ function CreateRestifyServer(globalCache, port, ipcport) {
 
         for (var i in temp.ipcPorts) {
             if (temp.ipcPorts[i] != temp.myIpcPort) {
-                IpcClient(temp.ipcPorts[i], data, res, '{"command": "list"}');
+                var params = [res, data];
+                IpcClient(temp.ipcPorts[i], '{"command": "list"}', onList, params);
             }
         }
         return next();
@@ -74,8 +75,11 @@ function CreateRestifyServer(globalCache, port, ipcport) {
     server.listen(port, function() {
         console.log("Http server listening at port: %s", port);
     });
-
-
 };
+
+function onList(params) {
+    params.data = data.concat(params.items);
+    params.res.json(params.data);
+}
 
 module.exports = CreateRestifyServer;

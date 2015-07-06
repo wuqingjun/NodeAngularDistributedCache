@@ -1,6 +1,7 @@
 ﻿var net = require('net');
 
-function IpcClient(serverIpcPort, data, res, jsonMessage) { //'{"command": "list"}'
+function IpcClient(serverIpcPort, jsonMessage, callback, params) { //'{"command": "list"}'
+    console.log('client is connecting to server port: ' + serverIpcPort);
     var client = net.connect({ port: serverIpcPort },
             function () {
         console.log('connected to server!');
@@ -9,9 +10,12 @@ function IpcClient(serverIpcPort, data, res, jsonMessage) { //'{"command": "list
     client.on('data', function (d) {
         var s = d.toString();
         var v = JSON.parse(s);
-        data = data.concat(v);
-        console.log(v);
-        res.json(data);
+        if (v.command === 'listreturn') {
+            params.items = v.items;
+            console.log('list return');
+            console.log(v.items);
+            callback(params);    
+        }
     });
     client.on('end', function () {
         console.log('disconnected from server');

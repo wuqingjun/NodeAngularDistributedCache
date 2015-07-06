@@ -1,4 +1,5 @@
 ﻿var restify = require('restify');
+var IpcClient = require('./ipcclient.js');
 
 function Registration(loadBalancerUrl) {
     this.loadBalancer = restify.createJsonClient({
@@ -26,6 +27,14 @@ Registration.prototype.unregister = function () {
         this.loadBalancer = null;
         process.exit();
     });
+}
+
+Registration.prototype.registerIpc = function (proxyIpcPort, httpPort, ipcPort, callback, params) {
+    var jsonObject = {};
+    jsonObject.command = 'registerserver';
+    jsonObject.connectionInfo = 'http://localhost:' + httpPort;
+    jsonObject.ipcport = ipcPort;
+    IpcClient(proxyIpcPort, JSON.stringify(jsonObject), callback, params);
 }
 
 module.exports = Registration;

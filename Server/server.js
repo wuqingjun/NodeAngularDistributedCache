@@ -18,7 +18,7 @@ var globalCache = new Cache();
 var ipcPorts = [8125, 8225];
 var PORT = 8124;
 var IPCPORT = 8125;
-var PROXYIPCPORT = 8081;
+var PROXYIPCPORT = 8083;
 var DEBUG = 1;
 
 var argOpts = {
@@ -32,9 +32,10 @@ var argOpts = {
 
 var argv = minimist(process.argv.slice(2), argOpts);
 CreateRestifyServer(globalCache, argv.port, argv.ipcPort);
-IpcServer(globalCache, argv.ipcPort);
+IpcServer(globalCache, argv.ipcPort, null, null);
 var reg = new Registration("http://" + argv.lbHost + ":" + argv.lbPort);
-reg.register(argv.port, argv.ipcPort);
+//reg.register(argv.port, argv.ipcPort);
+reg.registerIpc(PROXYIPCPORT, argv.port, argv.ipcPort);
 
 process.on('SIGINT', function () {
     if (reg.loadBalancer != null && reg.myId != null) {

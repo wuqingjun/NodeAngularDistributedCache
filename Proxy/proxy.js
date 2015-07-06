@@ -11,7 +11,7 @@ var proxyService = httpProxy.createServer();
 var globalCache = new Cache();  // this too
 
 var PORT = 8080;
-var IPCPORT = 8081;
+var IPCPORT = 8083;
 var DEBUG = 1;
 
 //  ------------  //
@@ -208,7 +208,7 @@ server.del('/servers/:id', function (req, res, next) { // delete server :id
                 cacheServers[idx] = last;
             }
             res.send(true);
-            return next()
+            return next();
         }
     }
     console.log("Server " + req.params.id + "not found");
@@ -224,9 +224,16 @@ server.listen(PORT, function () {
     console.log("Load Balancing Proxy Server RESfully Listening on: http://localhost:%s", PORT);
 });
 
-IpcServer(globalCache, IPCPORT);
+var params = { connectionInfo: '', ipcport: ''};
+IpcServer(globalCache, IPCPORT, registerServer, params);
 
 setInterval(function() {
     if (!globalCache.Executing) {
     }
 }, 3000);
+
+
+function registerServer(params) {
+    var newServer = { id: nextId(), connectionInfo: params.connectionInfo, ipcport: params.ipcport };
+    cacheServers.push(newServer);
+}
