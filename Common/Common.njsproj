@@ -31,6 +31,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="callbackfunction.js" />
+    <Compile Include="commands.js" />
     <Compile Include="commontest.js" />
     <Compile Include="cache.js" />
     <Compile Include="createRestifyServer.js" />

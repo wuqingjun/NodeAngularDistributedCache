@@ -1,6 +1,7 @@
 ﻿var Cache = require('../Common/cache.js'); // i think this can go away now
 var Utilities = require('../Common/utilities.js');
 var IpcServer = require('../Common/ipcserver.js');
+var CallbackFunction = require('../Common/callbackfunction.js');
 
 var net = require("net");
 var restify = require('restify');
@@ -18,7 +19,7 @@ var DEBUG = 1;
 //  Server Setup  //
 //  ------------  //
 var server = restify.createServer({
-    name: 'Load Balancing Proxy',
+    name: 'Load Balancing Proxy'
 });
 
 // uncomment for nifty curl support
@@ -224,8 +225,12 @@ server.listen(PORT, function () {
     console.log("Load Balancing Proxy Server RESfully Listening on: http://localhost:%s", PORT);
 });
 
-var params = { connectionInfo: '', ipcport: ''};
-IpcServer(globalCache, IPCPORT, registerServer, params);
+var callbacklist = [];
+var registerServerCallback = new CallbackFunction(registerServer, {});
+callbacklist['registerserver'] = new CallbackFunction(registerServer, {});
+callbacklist['heartbeat'] = new CallbackFunction(heartbeat, {});
+
+IpcServer(globalCache, IPCPORT, callbacklist);
 
 setInterval(function() {
     if (!globalCache.Executing) {
@@ -236,4 +241,8 @@ setInterval(function() {
 function registerServer(params) {
     var newServer = { id: nextId(), connectionInfo: params.connectionInfo, ipcport: params.ipcport };
     cacheServers.push(newServer);
+}
+
+function heartbeat(params) {
+    console.log('Heart beat from: ' + params.ServerIp + ':' + params.Port);
 }

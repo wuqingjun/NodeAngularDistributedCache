@@ -13,6 +13,7 @@ var Registration = require('../Common/register.js');
 var IpcServer = require('../Common/ipcserver.js');
 var IpcClient = require('../Common/ipcclient.js');
 var CreateRestifyServer = require('../Common/createRestifyServer.js');
+var CallbackFunction = require('../Common/callbackfunction.js');
 
 var globalCache = new Cache();
 var ipcPorts = [8125, 8225];
@@ -32,9 +33,13 @@ var argOpts = {
 
 var argv = minimist(process.argv.slice(2), argOpts);
 CreateRestifyServer(globalCache, argv.port, argv.ipcPort);
-IpcServer(globalCache, argv.ipcPort, null, null);
+
+var callbackList = [];
+callbackList['list'] = new CallbackFunction(list, {});
+
+IpcServer(globalCache, argv.ipcPort, callbackList);
+
 var reg = new Registration("http://" + argv.lbHost + ":" + argv.lbPort);
-//reg.register(argv.port, argv.ipcPort);
 reg.registerIpc(PROXYIPCPORT, argv.port, argv.ipcPort);
 
 process.on('SIGINT', function () {
@@ -45,3 +50,8 @@ process.on('SIGINT', function () {
         process.exit();
     }
 });
+
+
+function list() {
+    console.log('Required to list ...');
+}

@@ -1,7 +1,6 @@
 ﻿var net = require('net');
 
-function IpcServer(cache, ipcPort, callback, params) {
-    callback = callback || function() {}
+function IpcServer(cache, ipcPort, callbacks) {
     var ipcserver = net.createServer(function (c) {
         c.on('end', function () {
             console.log('client disconnected');
@@ -32,10 +31,19 @@ function IpcServer(cache, ipcPort, callback, params) {
                 ret.status = 'ok';
                 c.write(JSON.stringify(ret));
                 c.pipe(c);
-                params.connectionInfo = obj.connectionInfo;
-                params.ipcport = obj.ipcport;
+                callbacks[obj.command].Parameters.connectionInfo = obj.connectionInfo;
+                callbacks[obj.command].Parameters.ipcport = obj.ipcport;
+               // params.connectionInfo = obj.connectionInfo;
+               // params.ipcport = obj.ipcport;
             }
-            callback(params);
+            else if (obj.command === 'heartbeat') {
+                var ret = {};
+                ret.command = 'heartbeatreturn';
+                ret.status = 'ok';
+                c.write(JSON.stringify(ret));
+                c.pipe(c);
+            }
+            callbacks[obj.command].Callback(callbacks[obj.command].Parameters);
         });
     });
     ipcserver.listen(ipcPort, function () {

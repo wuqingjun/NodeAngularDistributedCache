@@ -1,0 +1,6 @@
+   To run the system: 
+   node proxy.js
+   node server.js  --port=8124 --ipcPort=8125 lbHost=localhost
+   node server.js  --port=8224 --ipcPort=8225 --lbHost=localhost
+   
+   To add key/value pairs, go to http://localhost:8080/. Fill the values and click the button. At this point of time you still need refresh(F5) to update the page to see the values you just input. 

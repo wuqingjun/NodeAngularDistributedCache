@@ -1,5 +1,11 @@
 ﻿var net = require("net");
 
+var elements = [];
+elements.push(3);
+
+var another = elements;
+another[0] = 4;
+
 var client = net.connect({ port: 8083 },
     function () {
     console.log('connected to server ascii!');
