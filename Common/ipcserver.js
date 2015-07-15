@@ -14,6 +14,7 @@ function IpcServer(cache, ipcPort, callbacks) {
             var msg = buf.toString('utf8', 0, len);
             var obj = JSON.parse(msg);
             if (obj.command === 'list') {
+                console.log('list required');
                 var ret = {};
                 ret.command = 'listreturn';
                 ret.status = 'ok';

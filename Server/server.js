@@ -54,7 +54,7 @@ process.on('SIGINT', function () {
 setInterval(function () {
     var param = {command: 'heartbeat', server: 'localhost', ipcport: argv.ipcPort};
     IpcClient(PROXYIPCPORT, JSON.stringify(param), null, null);
-}, 5000);
+}, 30000);
 
 
 function list() {
