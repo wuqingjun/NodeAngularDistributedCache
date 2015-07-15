@@ -33,10 +33,9 @@ function IpcServer(cache, ipcPort, callbacks) {
                 c.pipe(c);
                 callbacks[obj.command].Parameters.connectionInfo = obj.connectionInfo;
                 callbacks[obj.command].Parameters.ipcport = obj.ipcport;
-               // params.connectionInfo = obj.connectionInfo;
-               // params.ipcport = obj.ipcport;
             }
             else if (obj.command === 'heartbeat') {
+                callbacks[obj.command].Parameters = obj;
                 var ret = {};
                 ret.command = 'heartbeatreturn';
                 ret.status = 'ok';

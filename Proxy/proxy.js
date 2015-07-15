@@ -64,7 +64,9 @@ server.get('/', redirectRequest);
 var cacheServers = [// TO DO: start out with empty list and update everything to react appropriately
                     //{
                     //    id: 0,
-                    //    connectionInfo: 'http://localhost:8124'
+                    //    connectionInfo: 'http://localhost:8124',
+                    //    ipcport: 8225,
+                    //    lastheartbeat: datetime
                     //}
                     ];
 
@@ -239,10 +241,19 @@ setInterval(function() {
 
 
 function registerServer(params) {
-    var newServer = { id: nextId(), connectionInfo: params.connectionInfo, ipcport: params.ipcport };
+    var newServer = { id: nextId(), connectionInfo: params.connectionInfo, ipcport: params.ipcport, lastheartbeat:  new Date()};
     cacheServers.push(newServer);
 }
 
+function updateServer(params) {
+    for (var i = 0; i < cacheServers.length; ++i) {
+        if (cacheServers[i].ipcport === params.ipcport) {
+            cacheServers[i].lastheartbeat = new Date();
+        }
+    }
+}
+
 function heartbeat(params) {
-    console.log('Heart beat from: ' + params.ServerIp + ':' + params.Port);
+    console.log('Heart beat from: ' + params.server + ' :' + params.ipcport);
+    updateServer(params);
 }
