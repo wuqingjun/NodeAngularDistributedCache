@@ -7,6 +7,8 @@ var net = require("net");
 var restify = require('restify');
 var crypto = require('crypto');
 var httpProxy = require('http-proxy');
+var deepcopy = require('deepcopy');
+
 var proxyService = httpProxy.createServer();
 
 var globalCache = new Cache();  // this too
@@ -75,15 +77,83 @@ function nextId() {
     return nextServerId++;
 }
 
+
+var maxHash  = 0xFFFFFFFFFFFF;
+var halfHash = 0x7FFFFFFFFFFF;
+
+function findServerByAddress(address) {
+
+
+    // search second half of list for a server
+    var idx = Math.floor((address / maxHash) * cacheServers.length);
+
+    if (cacheServers.length <= 2) {
+        // there are only two entries and they're identical
+        return idx;
+    }
+
+    if (DEBUG >= 1) {
+        console.log("Searching for: %d", address);
+        console.log("idx: %d", idx);
+    }
+
+    for (idx; idx < cacheServers.length - 1; idx++) {
+        if (cacheServers[idx].address < address & address < cacheServers[idx + 1].address) {
+
+            if (DEBUG >= 1) {
+                console.log("Found %d between %d and %d", address,
+                                                          cacheServers[idx].address,
+                                                          cacheServers[idx + 1].address);
+            }
+
+            return idx + 1;
+        }
+    }
+    // check the rollover
+    if (cacheServers[cacheServers.length - 1].address < address & address < cacheServers[0].address) {
+
+        if (DEBUG >= 1) {
+            console.log("Found %d between %d and %d", address,
+                                                      cacheServers[cacheServers.length - 1].address,
+                                                      cacheServers[0].address);
+        }
+        return 0;
+    }
+
+    // search again from the beginning, we'll never get to the second half but whatever
+    idx = 0;
+    for (idx; idx < cacheServers.length - 1; idx++) {
+        if (cacheServers[idx].address < address & address < cacheServers[idx + 1].address) {
+
+            if (DEBUG >= 1) {
+                console.log("Found %d between %d and %d", address,
+                                                          cacheServers[idx].address,
+                                                          cacheServers[idx + 1].address);
+            }
+
+            return idx + 1;
+        }
+    }
+}
+
 function selectServer(req) {
     if (cacheServers.length == 0) {
         return undefined;
     }
+    var unhashedString = "";
+    if (req.params.key != undefined) {
+        // found a key, hash on that
+        unhashedString += req.params.key;
+    }
+    else {
+        // didnt find a key, this is just to select a random server
+        unhashedString += req.params;
+    }
 
-    var unhashedString = "" + req;
-    var hashed = crypto.createHash('md5').update(unhashedString).digest('hex').substring(0, 4);
-    var integer = parseInt(hashed, 16);
-    var idx = integer % cacheServers.length;
+    var hashed = crypto.createHash('sha1').update(unhashedString).digest('hex').substring(0, 12);
+    var hashAddress = parseInt(hashed, 16);
+    var idx = findServerByAddress(hashAddress);
+    console.log("~~~ idx: %d", idx);
     return cacheServers[idx].connectionInfo;
 }
 
@@ -241,8 +311,40 @@ setInterval(function() {
 
 
 function registerServer(params) {
-    var newServer = { id: nextId(), connectionInfo: params.connectionInfo, ipcport: params.ipcport, lastheartbeat:  new Date()};
-    cacheServers.push(newServer);
+
+    // place the new server twice, each on opposite sides of the ring
+    // this keeps us from having to balance the keys
+
+    var unhashedString = ""+params;
+    var hashed = crypto.createHash('sha1').update(unhashedString).digest('hex').substring(0, 12);
+    var hashAddress = parseInt(hashed, 16);
+
+    var firstIdx = findServerByAddress(hashAddress);
+
+    var firstNewServer = {
+        id: nextId(),
+        connectionInfo: params.connectionInfo,
+        ipcport: params.ipcport,
+        lastheartbeat: new Date(),
+        address: hashAddress
+    };
+
+    cacheServers.splice(firstIdx, 0, firstNewServer);
+    
+    if (halfHash < hashAddress) {
+        hashAddress -= halfHash;
+    }
+    else {
+        hashAddress += halfHash;
+    }
+
+    var secondIdx = findServerByAddress(hashAddress);
+    var secondNewServer = deepcopy(firstNewServer);
+    secondNewServer.address = hashAddress;
+
+    cacheServers.splice(secondIdx, 0, secondNewServer);
+
+    // TO DO: Transfer existing keys when a new server is added
 }
 
 function updateServer(params) {
