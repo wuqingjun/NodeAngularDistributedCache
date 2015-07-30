@@ -111,10 +111,46 @@ body {
                 </div>
             </div>
         </div>
-        <div id="listOfRecords" ng-repeat="record in records">
-            {{record.key}}
-            {{record.value}}
-        </div>
+
+        <table>
+            <tr>
+                <td style="width: 50%">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="record in records">
+                            <td>{{record.key}}</td>
+                            <td>{{record.value}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </td>
+                <td style="width: 50%">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%">Id</th>
+                                <th style="width: 70%">HeartBeat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="node in nodes">
+                                <td>{{node.id}}</td>
+                                <td>{{node.lastheartbeat}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+
     </div><!-- /.container -->
 
     <!-- Placed at the end of the document so pages load faster -->
@@ -124,7 +160,7 @@ body {
 
     <script>
         var app = angular.module("myApp", []);
-        app.controller("myCtrl", function ($scope, $http) {
+        app.controller("myCtrl", function ($scope, $http, $interval) {
             $scope.inputkey = 'k1';
             $scope.inputvalue = 'v1';
             $scope.readkey = 'k1';
@@ -143,14 +179,24 @@ body {
                     console.log('post error: ' + data);
                 });
             }
-            $scope.retrieve = function () {
-                $http.get('/data/' + $scope.readkey).success(function (data) {
-                    console.log('post success: ' + data);
-                })
-                .error(function (data) {
-                    console.log('post error: ' + data);
-                });
+            $scope.retrieve = function() {
+                $http.get('/data/' + $scope.readkey).success(function(data) {
+                        console.log('post success: ' + data);
+                    })
+                    .error(function(data) {
+                        console.log('post error: ' + data);
+                    });
             }
+
+            $interval(function() {
+                $http.get('/servers').success(function (data) {
+                    console.log('post success: ' + data);
+                    $scope.nodes = data;
+                    })
+                     .error(function (data) {
+                         console.log('post error: ' + data);
+                     });
+            }, 3000);
         });
     </script>
 </body>
