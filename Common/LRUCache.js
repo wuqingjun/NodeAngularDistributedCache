@@ -11,13 +11,13 @@ var Dll = function() {
     this.tail = new Node(null, null);
 
     this.head.next = this.tail;
-    this.tail.next = this.head;
+    this.tail.prev = this.head;
 };
 
 Dll.prototype.append = function(n) {
     this.tail.prev.next = n;
-    n.prev = tail.prev;
-    n.next = tail;
+    n.prev = this.tail.prev;
+    n.next = this.tail;
     this.tail.prev = n;
 };
 
@@ -35,14 +35,17 @@ var LRUCache = function(capacity) {
     this.dll = new Dll();
 };
 
-LRUCache.prototype.get = function(key) {
+LRUCache.prototype.get = function (key) {
+    this.Executing = true;
     if (key in this.mp) {
-        this.dll.remove(mp[key]);
+        this.dll.remove(this.mp[key]);
         this.dll.append(this.mp[key]);
     }
+    this.Executing = false;
 };
 
 LRUCache.prototype.set = function (key, value) {
+    this.Executing = true;
     if (key in this.mp) {
         this.mp[key].value = value;
         this.dll.remove(this.mp[key]);
@@ -50,16 +53,17 @@ LRUCache.prototype.set = function (key, value) {
     } else {
         var p = new Node(key, value);
         if (this.Count === this.Size) {
-            delete this.mp[this.head.next.key];
-            this.dll.remove(this.dll.next);
+            delete this.mp[this.dll.head.next.key];
+            this.dll.remove(this.dll.head.next);
             this.dll.append(p);
             this.mp[key] = p;
         } else {
             this.mp[key] = p;
             this.dll.append(p);
-            ++Count;
+            ++this.Count;
         }
     }
+    this.Executing = false;
 };
 
 module.exports = LRUCache;

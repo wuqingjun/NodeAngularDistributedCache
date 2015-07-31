@@ -13,7 +13,7 @@
     <ProjectGuid>0c9ff81a-4222-4bf1-9809-f1dc8dc93da8</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>test.js</StartupFile>
+    <StartupFile>lrucachetest.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -31,6 +31,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="lrucachetest.js" />
     <Compile Include="test.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
