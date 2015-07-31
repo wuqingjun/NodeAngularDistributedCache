@@ -28,7 +28,7 @@ Dll.prototype.remove = function(n) {
 
 
 var LRUCache = function(capacity) {
-    this.mp = new Array();
+    this.Objectes = new Array();
     this.Size = capacity;
     this.Count = 0;
     this.Executing = false;
@@ -37,33 +37,45 @@ var LRUCache = function(capacity) {
 
 LRUCache.prototype.get = function (key) {
     this.Executing = true;
-    if (key in this.mp) {
-        this.dll.remove(this.mp[key]);
-        this.dll.append(this.mp[key]);
+    if (key in this.Objectes) {
+        this.dll.remove(this.Objectes[key]);
+        this.dll.append(this.Objectes[key]);
     }
     this.Executing = false;
+    return this.Objectes[key].value;
 };
 
-LRUCache.prototype.set = function (key, value) {
+LRUCache.prototype.push = function (key, value) {
     this.Executing = true;
-    if (key in this.mp) {
-        this.mp[key].value = value;
-        this.dll.remove(this.mp[key]);
-        this.dll.append(this.mp[key]);
+    if (key in this.Objectes) {
+        this.Objectes[key].value = value;
+        this.dll.remove(this.Objectes[key]);
+        this.dll.append(this.Objectes[key]);
     } else {
         var p = new Node(key, value);
         if (this.Count === this.Size) {
-            delete this.mp[this.dll.head.next.key];
+            delete this.Objectes[this.dll.head.next.key];
             this.dll.remove(this.dll.head.next);
             this.dll.append(p);
-            this.mp[key] = p;
+            this.Objectes[key] = p;
         } else {
-            this.mp[key] = p;
+            this.Objectes[key] = p;
             this.dll.append(p);
             ++this.Count;
         }
     }
     this.Executing = false;
 };
+
+LRUCache.prototype.clear = function () {
+    this.Executing = true;
+    while (this.Count > 0) {
+        delete this.Objectes[this.dll.head.next.key];
+        this.dll.remove(this.dll.head.next);
+        --this.Count;
+    }
+    this.Executing = false;
+};
+
 
 module.exports = LRUCache;

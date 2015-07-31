@@ -27,7 +27,7 @@ function CreateRestifyServer(globalCache, port, ipcport) {
         console.log(temp.ipcPorts);
         var data = [];
         for (var k in globalCache.Objectes) {
-            data.push({ key: k, value: globalCache.Objectes[k] });
+            data.push({ key: k, value: globalCache.get(k) });
         }
         res.json(data);
 

@@ -5,6 +5,7 @@
 
 var http = require('http');
 var Cache = require('../Common/cache.js');
+var LRUCache = require('../Common/lrucache.js');
 var restify = require('restify');
 var querystring = require('querystring');
 var minimist = require('minimist');
@@ -15,7 +16,7 @@ var IpcClient = require('../Common/ipcclient.js');
 var CreateRestifyServer = require('../Common/createRestifyServer.js');
 var CallbackFunction = require('../Common/callbackfunction.js');
 
-var globalCache = new Cache();
+var globalCache = new LRUCache(); // Cache();
 var ipcPorts = [8125, 8225];
 var PORT = 8124;
 var IPCPORT = 8125;
