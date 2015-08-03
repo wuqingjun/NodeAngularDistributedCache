@@ -153,7 +153,6 @@ function selectServer(req) {
     var hashed = crypto.createHash('sha1').update(unhashedString).digest('hex').substring(0, 12);
     var hashAddress = parseInt(hashed, 16);
     var idx = findServerByAddress(hashAddress);
-    console.log("~~~ idx: %d", idx);
     return cacheServers[idx].connectionInfo;
 }
 

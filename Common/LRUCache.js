@@ -37,12 +37,14 @@ var LRUCache = function(capacity) {
 
 LRUCache.prototype.get = function (key) {
     this.Executing = true;
+    var value = undefined;
     if (key in this.Objectes) {
         this.dll.remove(this.Objectes[key]);
         this.dll.append(this.Objectes[key]);
+        value = this.Objectes[key].value;
     }
     this.Executing = false;
-    return this.Objectes[key].value;
+    return value;
 };
 
 LRUCache.prototype.push = function (key, value) {

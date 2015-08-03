@@ -248,15 +248,18 @@ body {
                     });
             }
 
-            $interval(function() {
+            var loadServers = function() {
                 $http.get('/servers').success(function (data) {
                     console.log('GET /servers success: ' + angular.toJson(data));
                     $scope.nodes = data;
-                    })
-                     .error(function (data) {
-                         console.log('GET /servers error: ' + data);
-                     });
-            }, 3000);
+                })
+                .error(function (data) {
+                    console.log('GET /servers error: ' + data);
+                });
+            };
+
+            loadServers();
+            $interval(loadServers, 30000);
         });
     </script>
 </body>

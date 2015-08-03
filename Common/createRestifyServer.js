@@ -18,7 +18,12 @@ function CreateRestifyServer(globalCache, port, ipcport) {
         });
 
     server.use(restify.bodyParser());
-
+    /*
+    server.on('uncaughtException', function (request, response, route, error) {
+        console.log(error);
+        console.log(error.stack);
+    });  // Emitted when some handler throws an uncaughtException somewhere in the chain. The default behavior is to just call res.send(error), and let the built-ins in restify handle transforming, but you can override to whatever you want here.
+    */
     server.get(/^\/(?!(data|all)).*/, restify.serveStatic({
         directory: './public',
         default: 'index.html'
@@ -47,8 +52,11 @@ function CreateRestifyServer(globalCache, port, ipcport) {
         if (DEBUG >= 1) {
             console.log("GET: %s", req.params.key);
         }
-
         var value = globalCache.get(req.params.key);
+        if (value == undefined) {
+            // return a 404 because that's what's in the Report Document
+            return next(new restify.NotFoundError("Key not found: '" + req.params.key + "'"));
+        }
         res.send(value);
         return next();
     });
