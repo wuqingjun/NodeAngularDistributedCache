@@ -1,6 +1,8 @@
 ﻿var restify = require('restify');
 var IpcClient = require('../common/ipcclient.js');
 
+var DEBUG = 1;
+
 function CreateRestifyServer(globalCache, port, ipcport) {
     this.ipcPorts = [8125, 8225];
     this.myIpcPort = ipcport;
@@ -40,27 +42,41 @@ function CreateRestifyServer(globalCache, port, ipcport) {
         return next();
     });
 
-    server.get('/data/:key', function(req, res, next) {
+    server.get('/data/:key', function (req, res, next) {
+
+        if (DEBUG >= 1) {
+            console.log("GET: %s", req.params.key);
+        }
+
         var value = globalCache.get(req.params.key);
         res.send(value);
         return next();
     });
 
 
-    server.put('/data/:key', function(req, res, next) {
+    server.put('/data/:key', function (req, res, next) {
+        if (DEBUG >= 1) {
+            console.log("PUT: %s:%s", req.params.key, req.params.value);
+        }
         globalCache.push(req.params.key, req.params.value);
         res.send(true);
         return next();
     });
 
 
-    server.post('/data/:key', function(req, res, next) {
+    server.post('/data/:key', function (req, res, next) {
+        if (DEBUG >= 1) {
+            console.log("PUT: %s:%s", req.params.key, req.params.value);
+        }
         globalCache.push(req.params.key, req.params.value);
         res.send(true);
         return next();
     });
 
-    server.del('/data/:key', function(req, res, next) {
+    server.del('/data/:key', function (req, res, next) {
+        if (DEBUG >= 1) {
+            console.log("DEL: %s:%s", req.params.key);
+        }
         globalCache.push(req.params.key, globalCache.default);
         res.send(true);
         return next();

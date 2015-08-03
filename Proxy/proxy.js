@@ -191,7 +191,16 @@ server.del('/data/:key', redirectRequest);
 //  --------  //
 server.get('/servers', function (req, res, next) { // list all servers
     // TO DO: make this prettier
-    res.send(cacheServers);
+    var uniqueServers = [];
+    var addedIds = [];
+    for (var idx = 0; idx < cacheServers.length; idx++) {
+        if (addedIds.indexOf(cacheServers[idx].id) == -1) {
+            uniqueServers.push(cacheServers[idx]);
+            addedIds.push(cacheServers[idx].id);
+        }
+    }
+
+    res.send(uniqueServers);
     return next();
 });
 

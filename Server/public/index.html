@@ -11,6 +11,21 @@ body {
     padding: 40px 15px;
     text-align: center;
 }
+.greenBg-add, .greenBg-remove,
+.whiteBg-add, .whiteBg-remove {
+  transition: background-color 500ms linear;
+}
+
+.greenBg,
+.greenBg-add.greenBg-add-active {
+    background-color: #00ff00;
+}
+
+.grayBg,
+.grayBg-add.grayBg-add-active {
+    background-color: #dddddd;
+}
+
     </style>
 </head>
 
@@ -24,13 +39,13 @@ body {
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Project name</a>
+                <a class="navbar-brand" href="#">NodeAngularDistributedCache</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <!--li><a href="#about">About</a></li-->
+                    <!--li><a href="#contact">Contact</a></li-->
                 </ul>
             </div><!--/.nav-collapse -->
         </div>
@@ -39,7 +54,7 @@ body {
     <div class="jumbotron">
         <div class="container">
             <h2>Welcome to the NodeAngularDistributedCache Front End</h2>
-            <p>This utility can be used to interact with our Distributed Cache System.</p>
+            <p>Use this AngularJS WebApp to interact with our NodeJS Distributed Cache System.</p>
         </div>
     </div>
 
@@ -90,13 +105,13 @@ body {
                                     <div class="form-group">
                                         <label for="key_02" class="col-sm-6 control-label">Key:</label>
                                         <div class="col-sm-6">
-                                            <input type="text" ng-model="readkey" id="key_02" placeholder="k1"/>
+                                            <input type="text" ng-model="readkey" id="key_02" placeholder="k1" />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="value_02" class="col-sm-6 control-label">Value:</label>
                                         <div class="col-sm-6">
-                                            <input type="text" ng-model="readvalue" id="value_02"/>
+                                            <input type="text" ng-model="readvalue" ng-class="colorVal" id="value_02" class="grayBg" readonly>
                                         </div>
                                     </div>
                                 </form>
@@ -112,89 +127,114 @@ body {
             </div>
         </div>
 
-        <table>
-            <tr>
-                <td style="width: 50%">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Key</th>
-                            <th>Value</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="record in records">
-                            <td>{{record.key}}</td>
-                            <td>{{record.value}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-
-                </td>
-                <td style="width: 50%">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 30%">Id</th>
-                                <th style="width: 70%">HeartBeat</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="node in nodes">
-                                <td>{{node.id}}</td>
-                                <td>{{node.lastheartbeat}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                </td>
-            </tr>
-        </table>
+        <div class="row">
+            <div class="col-md-6 card">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">All Current Records</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Key</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="record in records">
+                                            <td>{{record.key}}</td>
+                                            <td>{{record.value}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 card">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Server Heartbeats</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 30%">Id</th>
+                                                <th style="width: 70%">HeartBeat</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="node in nodes">
+                                                <td>{{node.id}}</td>
+                                                <td>{{node.lastheartbeat}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div><!-- /.container -->
 
     <!-- Placed at the end of the document so pages load faster -->
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-beta.5/angular-animate.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
     <script>
-        var app = angular.module("myApp", []);
-        app.controller("myCtrl", function ($scope, $http, $interval) {
+        var app = angular.module("myApp", ['ngAnimate']);
+        app.controller("myCtrl", function ($scope, $http, $interval, $timeout) {
             $scope.inputkey = 'k1';
             $scope.inputvalue = 'v1';
             $scope.readkey = 'k1';
             $http.get('/all').success(function (data) {
-                console.log(data);
+                console.log('GET /all success: ' + angular.toJson(data));
                 $scope.records = data;
             })
             .error(function (data) {
-                console.log('get error at server:' + data);
+                console.log('GET /all error:' + data);
             });
             $scope.save = function () {
-                $http.post('/data/', { key: $scope.inputkey, value: $scope.inputvalue }).success(function (data) {
-                    console.log('post success: ' + data);
+                $http.post('/data/' + $scope.inputkey, { value: $scope.inputvalue }).success(function (data) {
+                    console.log('POST /data/:key success: ' + data);
                 })
                 .error(function (data) {
-                    console.log('post error: ' + data);
+                    console.log('POST /data/:key error: ' + data);
                 });
             }
             $scope.retrieve = function() {
                 $http.get('/data/' + $scope.readkey).success(function(data) {
-                        console.log('post success: ' + data);
+                        console.log('GET /data/:key success: ' + data);
+                        $scope.readvalue = data;
+                        $scope.colorVal = "greenBg";
+                        $timeout(function () { $scope.colorVal = "grayBg"; }, 500);
+                        
                     })
-                    .error(function(data) {
-                        console.log('post error: ' + data);
+                    .error(function (response) {
+                        console.log('GET /data/:key error: ' + data);
                     });
             }
 
             $interval(function() {
                 $http.get('/servers').success(function (data) {
-                    console.log('post success: ' + data);
+                    console.log('GET /servers success: ' + angular.toJson(data));
                     $scope.nodes = data;
                     })
                      .error(function (data) {
-                         console.log('post error: ' + data);
+                         console.log('GET /servers error: ' + data);
                      });
             }, 3000);
         });
