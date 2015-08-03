@@ -12,6 +12,7 @@ body {
     text-align: center;
 }
 .greenBg-add, .greenBg-remove,
+.redBg-add, .redBg-remove,
 .whiteBg-add, .whiteBg-remove {
   transition: background-color 500ms linear;
 }
@@ -19,6 +20,11 @@ body {
 .greenBg,
 .greenBg-add.greenBg-add-active {
     background-color: #00ff00;
+}
+
+.redBg {
+    transition: background-color 1s ease;
+    background-color: #ff0000;
 }
 
 .grayBg,
@@ -219,12 +225,26 @@ body {
                 $http.get('/data/' + $scope.readkey).success(function(data) {
                         console.log('GET /data/:key success: ' + data);
                         $scope.readvalue = data;
-                        $scope.colorVal = "greenBg";
-                        $timeout(function () { $scope.colorVal = "grayBg"; }, 500);
-                        
-                    })
-                    .error(function (response) {
+                        $timeout(function () {
+                            $scope.colorVal = "greenBg";
+                            $timeout(function () {
+                                $scope.colorVal = "grayBg";
+                            }, 2000);
+                        }, 100);
+                                            })
+                    .error(function (data) {
                         console.log('GET /data/:key error: ' + data);
+                        
+                        $scope.readvalue = "<key not found>";
+
+                        $timeout(function () {
+                            $scope.colorVal = "redBg";
+                            $timeout(function () {
+                                $scope.colorVal = "grayBg";
+                                $scope.readvalue = "";
+                            }, 2000);
+                        }, 100);
+                        
                     });
             }
 
