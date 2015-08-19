@@ -15,6 +15,7 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Test", "Test\Test.njsproj",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{04CD5AD3-8D7F-467A-A737-9994ABA7EAC0}"
 	ProjectSection(SolutionItems) = preProject
+		DistributedCacheForAngularJSNodeJS.pdf = DistributedCacheForAngularJSNodeJS.pdf
 		HowTo.txt = HowTo.txt
 	EndProjectSection
 EndProject

@@ -4,7 +4,7 @@ var IpcClient = require('../common/ipcclient.js');
 var DEBUG = 1;
 
 function CreateRestifyServer(globalCache, port, ipcport) {
-    this.ipcPorts = [8125, 8225];
+    this.ipcPorts = [8125, 8225, 8325, 8425];
     this.myIpcPort = ipcport;
     this.httpPort = port;
     this.server= restify.createServer({
