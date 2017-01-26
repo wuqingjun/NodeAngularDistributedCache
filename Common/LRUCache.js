@@ -1,11 +1,12 @@
-﻿var Node = function(k, v) {
+// Double Linked List Node
+var Node = function(k, v) {
     this.key = k;
     this.value = v;
     this.prev = null;
     this.next = null;
 };
 
-
+// Double Linked List constructor
 var Dll = function() {
     this.head = new Node(null, null);
     this.tail = new Node(null, null);
@@ -14,6 +15,7 @@ var Dll = function() {
     this.tail.prev = this.head;
 };
 
+// Appending a node to the tail.
 Dll.prototype.append = function(n) {
     this.tail.prev.next = n;
     n.prev = this.tail.prev;
@@ -21,12 +23,15 @@ Dll.prototype.append = function(n) {
     this.tail.prev = n;
 };
 
+// remove a node from the list.
 Dll.prototype.remove = function(n) {
     n.prev.next = n.next;
     n.next.prev = n.prev;
-};
+}
 
-
+// construting a LRU Cache. Initial size is set to capacity.
+// a dictionary is also constructed. The value field of the dictionary is pointing the address(reference) 
+// of the corresponding node in the double linked list.
 var LRUCache = function(capacity) {
     this.Objectes = new Array();
     this.Size = capacity;
@@ -35,6 +40,7 @@ var LRUCache = function(capacity) {
     this.dll = new Dll();
 };
 
+// return the value given a key, and also move the node to the tail.
 LRUCache.prototype.get = function (key) {
     this.Executing = true;
     var value = undefined;
@@ -47,6 +53,8 @@ LRUCache.prototype.get = function (key) {
     return value;
 };
 
+// push a (key, value) to the cache. A node will be added to the tail of the dll, 
+// and (key, address of the node) will also be added into the dictionary.
 LRUCache.prototype.push = function (key, value) {
     this.Executing = true;
     if (key in this.Objectes) {
