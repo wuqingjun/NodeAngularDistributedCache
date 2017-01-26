@@ -42,21 +42,18 @@ var LRUCache = function(capacity) {
 
 // return the value given a key, and also move the node to the tail.
 LRUCache.prototype.get = function (key) {
-    this.Executing = true;
     var value = undefined;
     if (key in this.Objectes) {
         this.dll.remove(this.Objectes[key]);
         this.dll.append(this.Objectes[key]);
         value = this.Objectes[key].value;
     }
-    this.Executing = false;
     return value;
 };
 
 // push a (key, value) to the cache. A node will be added to the tail of the dll, 
 // and (key, address of the node) will also be added into the dictionary.
 LRUCache.prototype.push = function (key, value) {
-    this.Executing = true;
     if (key in this.Objectes) {
         this.Objectes[key].value = value;
         this.dll.remove(this.Objectes[key]);
@@ -74,17 +71,15 @@ LRUCache.prototype.push = function (key, value) {
             ++this.Count;
         }
     }
-    this.Executing = false;
 };
 
+// cleaning the cache
 LRUCache.prototype.clear = function () {
-    this.Executing = true;
     while (this.Count > 0) {
         delete this.Objectes[this.dll.head.next.key];
         this.dll.remove(this.dll.head.next);
         --this.Count;
     }
-    this.Executing = false;
 };
 
 
